@@ -205,7 +205,8 @@ export default function EditorPage() {
 
                   <button
                     onClick={handleSave}
-                    className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition font-medium"
+                    disabled={saveStatus === 'saving'}
+                    className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Сохранить изменения
                   </button>

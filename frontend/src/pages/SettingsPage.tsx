@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import { useAuthStore } from '../store/authStore'
 import { User, Lock, CreditCard, Bell, Crown } from 'lucide-react'
@@ -264,9 +265,12 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     {user?.subscription === 'free' && (
-                      <button className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition">
+                      <Link
+                        to="/pricing"
+                        className="inline-flex items-center bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
+                      >
                         Обновить до Pro
-                      </button>
+                      </Link>
                     )}
                   </div>
 

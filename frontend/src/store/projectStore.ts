@@ -171,7 +171,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         }
       })
     } catch (error: any) {
-      set({ error: error.message || 'Не удалось обновить проект' })
+      const message = error.message || 'Не удалось обновить проект'
+      set({ error: message })
+      throw new Error(message)
     }
   },
   

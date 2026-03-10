@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useProjectStore } from '../store/projectStore'
 import { Eye, Download, Sparkles, Menu } from 'lucide-react'
 
-type Section = 'company' | 'products' | 'audience' | 'benefits' | 'pricing' | 'contacts' | 'cases' | 'faq'
+type Section = 'company' | 'products'
 
 export default function EditorPage() {
   const { id } = useParams<{ id: string }>()
@@ -24,6 +24,7 @@ export default function EditorPage() {
     faq: []
   })
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   useEffect(() => {
     if (project) {
@@ -37,22 +38,22 @@ export default function EditorPage() {
     }
   }, [project, loadProjects])
 
-  const handleSave = () => {
-    if (id) {
-      updateProject(id, { data: formData })
-      alert('Проект сохранен!')
+  const handleSave = async () => {
+    if (!id) return
+    setSaveStatus('saving')
+    try {
+      await updateProject(id, { data: formData })
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    } catch {
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 3000)
     }
   }
 
-  const sections = [
-    { id: 'company', name: 'О компании', progress: 60 },
-    { id: 'products', name: 'Продукты/Услуги', progress: 30 },
-    { id: 'audience', name: 'Целевая аудитория', progress: 0 },
-    { id: 'benefits', name: 'Преимущества', progress: 0 },
-    { id: 'pricing', name: 'Тарифы', progress: 0 },
-    { id: 'contacts', name: 'Контакты', progress: 0 },
-    { id: 'cases', name: 'Кейсы', progress: 0 },
-    { id: 'faq', name: 'FAQ', progress: 0 }
+  const sections: { id: Section; name: string }[] = [
+    { id: 'company', name: 'О компании' },
+    { id: 'products', name: 'Продукты/Услуги' }
   ]
 
   if (loading) {
@@ -84,7 +85,15 @@ export default function EditorPage() {
             onChange={(e) => updateProject(id!, { name: e.target.value })}
             className="text-xl font-semibold border-none focus:outline-none focus:ring-2 focus:ring-primary-500 rounded px-2"
           />
-          <span className="text-sm text-gray-500">Автосохранение</span>
+          {saveStatus === 'saving' && (
+            <span className="text-sm text-gray-500">Сохранение...</span>
+          )}
+          {saveStatus === 'saved' && (
+            <span className="text-sm font-medium text-green-600">Сохранено!</span>
+          )}
+          {saveStatus === 'error' && (
+            <span className="text-sm text-red-600">Ошибка сохранения</span>
+          )}
         </div>
 
         <div className="flex items-center space-x-3">
@@ -129,12 +138,7 @@ export default function EditorPage() {
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <span>{section.name}</span>
-                      {section.progress > 0 && (
-                        <span className="text-xs text-gray-500">{section.progress}%</span>
-                      )}
-                    </div>
+                    <span>{section.name}</span>
                   </button>
                 ))}
               </nav>
@@ -219,18 +223,13 @@ export default function EditorPage() {
                 <button className="w-full border-2 border-dashed border-gray-300 rounded-lg py-8 text-gray-500 hover:border-primary-600 hover:text-primary-600 transition">
                   + Добавить продукт
                 </button>
-              </div>
-            )}
-
-            {/* Other sections - simplified for demo */}
-            {activeSection !== 'company' && activeSection !== 'products' && (
-              <div className="bg-white rounded-xl shadow-sm p-8">
-                <h2 className="text-2xl font-bold mb-6">
-                  {sections.find(s => s.id === activeSection)?.name}
-                </h2>
-                <p className="text-gray-600">
-                  Этот раздел будет доступен в следующей версии
-                </p>
+                <button
+                  onClick={handleSave}
+                  disabled={saveStatus === 'saving'}
+                  className="mt-6 w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Сохранить изменения
+                </button>
               </div>
             )}
           </div>

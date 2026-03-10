@@ -12,7 +12,6 @@ type FieldErrors = Partial<{
   email: string
   password: string
   confirmPassword: string
-  plan: string
   agreed: string
 }>
 
@@ -21,7 +20,6 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [plan, setPlan] = useState('free')
   const [agreed, setAgreed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -76,7 +74,7 @@ export default function SignupPage() {
     setFieldErrors({})
     
     try {
-      await signup(name, email, password, plan, agreed, agreed)
+      await signup(name, email, password, 'free', agreed, agreed)
       navigate('/dashboard')
     } catch (error: any) {
       const apiFieldErrors = error?.fieldErrors as Record<string, string> | undefined
@@ -189,41 +187,6 @@ export default function SignupPage() {
               />
               {fieldErrors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Выберите тариф
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setPlan('free')}
-                  className={`p-3 border-2 rounded-lg text-center transition ${
-                    plan === 'free' 
-                      ? 'border-primary-600 bg-primary-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="font-semibold">Free</div>
-                  <div className="text-xs text-gray-600">3 проекта</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPlan('pro')}
-                  className={`p-3 border-2 rounded-lg text-center transition ${
-                    plan === 'pro' 
-                      ? 'border-primary-600 bg-primary-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="font-semibold">Pro</div>
-                  <div className="text-xs text-gray-600">Безлимит</div>
-                </button>
-              </div>
-              {fieldErrors.plan && (
-                <p className="mt-2 text-sm text-red-600">{fieldErrors.plan}</p>
               )}
             </div>
 
